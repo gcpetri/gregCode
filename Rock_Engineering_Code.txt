@@ -1,0 +1,66 @@
+						ROCK ENGINEERING & TESTING LABORATORY INC.
+
+								DESCRIPTION:
+			** Program to extract latitude and longitude coordinates or addresses from pdf files **
+			** corresponding to geo-engineering jobs and list them, along with their job names & **
+						** job numbers in a produced .txt file **
+
+INSTRUCTIONS:
+1. Download Ubuntu from your app store
+	- create a username and password
+2. Install pdf to text file converter, instructions as follows:
+	- type into Ubuntu command line "sudo apt install poppler-utils"
+3. Navigate to the directory (folder) above the directory containing all the geo-job folders
+	- type "cd <folder name>" to move into a folder, "cd ../" to get out of a folder, "pwd" to see which directory you are currently 	  in, and "ls" to see which directories you can move into
+4. Copy and Paste the code (for use) below into the ubuntu command line
+
+
+
+CODE:						
+*for visual only (do NOT use)*
+
+i=0 ;
+for FOLDER in 'SA GEO 2019'/*19* ; 
+	do echo "$(basename "$FOLDER")" >> Geo2019List.txt ; 
+	hasLog=false; hasReceipt=false ; 
+	for FILE in "$FOLDER"/* ; 
+		do NAME="$(basename "$FILE")" ;
+		RECEIPT=0 ; 
+		if [[ $NAME == *-0001.pdf ]] ; then
+			hasReceipt=true ; 
+			RECEIPT=$NAME ; 
+			pdftotext "$FOLDER"/$RECEIPT receiptPDF.txt ; 
+		fi ; 
+		if [[ $NAME == "logs.pdf" ]] || [[ $NAME == "log.pdf" ]] || [[ $NAME == "boring logs.pdf" ]] || [[ $NAME == "boring log.pdf" ]] ; then 
+			hasLog=true ; 
+			pdftotext "$FOLDER"/"$NAME" logsPDF.txt ; 
+			ack "GPS Coordinates" -1 logsPDF.txt >> Geo2019List.txt ; 
+			i=$((i+1)) ;
+		fi ; 
+	done ; 
+	if [[ $hasReceipt == true ]] && [[ $hasLog == false ]] ; then 
+		ack -A 4 "Client:" -1 receiptPDF.txt >> Geo2019List.txt ; 
+		i=$((i+1)) ; 
+	elif [[ $hasReceipt == false ]] && [[ $hasLog == false ]] ; then
+		echo "#########  no location!  #########" >> Geo2019List.txt ; 
+		i=$((i+1)) ; 
+	fi ; 
+	echo " " >> Geo2019List.txt ;
+done ; 
+chmod -w Geo2019List.txt ; 
+echo "Job folders gone through:" ;
+echo $i
+
+
+
+CODE:
+*to USE (copy and paste into ubuntu terminal command line)*
+
+i=0 ; for FOLDER in 'SA GEO 2019'/*19* ; do echo "$(basename "$FOLDER")" >> Geo2019List.txt ; hasLog=false; hasReceipt=false ; for FILE in "$FOLDER"/* ; 
+do NAME="$(basename "$FILE")" ; RECEIPT=0 ; if [[ $NAME == *-0001.pdf ]] ; then hasReceipt=true ; RECEIPT=$NAME ; pdftotext "$FOLDER"/$RECEIPT receiptPDF.txt ;
+fi ; if [[ $NAME == "logs.pdf" ]] || [[ $NAME == "log.pdf" ]] || [[ $NAME == "boring logs.pdf" ]] || [[ $NAME == "boring log.pdf" ]] ; then hasLog=true ; 
+pdftotext "$FOLDER"/"$NAME" logsPDF.txt ; ack "GPS Coordinates" -1 logsPDF.txt >> Geo2019List.txt ; 
+i=$((i+1)) ; fi ; done ; if [[ $hasReceipt == true ]] && [[ $hasLog == false ]] ; then ack -A 4 "Client:" -1 receiptPDF.txt >> Geo2019List.txt ; i=$((i+1)) ; elif [[ $hasReceipt == false ]] && [[ $hasLog == false ]] ; 
+then echo "#########  no location!  #########" >> Geo2019List.txt ; i=$((i+1)) ; fi ; echo "----------------- $i ----------------- " >> Geo2019List.txt ; done ; chmod -w Geo2019List.txt ; 
+echo "Job folders gone through:" ; echo $i
+
